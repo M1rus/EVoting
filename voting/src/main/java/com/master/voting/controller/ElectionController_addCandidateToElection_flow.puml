@@ -1,0 +1,66 @@
+@startuml
+!define Security \n"Логіка автентифікації"
+package "Система електронного голосування" {
+  package "Клієнтський рівень" {
+    [Веб-браузер]
+  }
+
+  package "Серверний рівень" {
+    component "SecurityConfig" <<Security>> {
+      note right: Виконує автентифікацію та авторизацію\nдля користувачів
+    }
+    component "HomeController" {
+      note right: Обробляє запити\nдля домашньої сторінки
+    }
+    component "ElectionController" {
+      note right: Керує виборами\nта відображає статистику
+    }
+    component "VoteController" {
+      note right: Реалізує функціонал\nголосування
+    }
+    component "RegistrationController" {
+      note right: Реєстрація користувачів
+    }
+    component "UserService" {
+      note right: Обробляє дані користувачів\nта ролі
+    }
+    component "VoteService" {
+      note right: Перевіряє та додає голоси
+    }
+    component "ElectionService" {
+      note right: Управляє даними виборів
+    }
+  }
+
+  package "Рівень зберігання даних" {
+    database "База даних MySQL" {
+      note right: Зберігає інформацію про вибори, користувачів,\nкандидатів та голоси
+    }
+  }
+}
+
+[Веб-браузер] --> SecurityConfig : Запит автентифікації
+
+SecurityConfig --> HomeController : Після автентифікації
+SecurityConfig --> RegistrationController : Запит реєстрації
+SecurityConfig --> ElectionController : Запит до виборів
+SecurityConfig --> VoteController : Запит голосування
+
+HomeController --> [Веб-браузер] : HTML-сторінка
+RegistrationController --> [Веб-браузер] : Статус реєстрації
+ElectionController --> [Веб-браузер] : Дані про вибори
+VoteController --> [Веб-браузер] : Підтвердження голосування
+
+SecurityConfig --> "База даних MySQL" : Перевірка даних користувача
+
+UserService --> SecurityConfig : Дані користувачів
+UserService --> "База даних MySQL" : Зчитування/запис
+
+VoteController --> VoteService : Дані про голоси
+VoteService --> "База даних MySQL" : Збереження голосів
+
+ElectionController --> ElectionService : Дані про вибори
+ElectionService --> "База даних MySQL" : Збереження даних про вибори
+@enduml
+
+

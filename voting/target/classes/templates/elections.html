@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Вибори</title>
+</head>
+<body>
+<h1>Список</h1>
+<div sec:authorize="hasRole('ROLE_COMITEE')">
+  <form th:action="@{/elections/create}" method="post">
+    <input type="text" name="name" placeholder="Назва" required />
+    <input type="text" name="description" placeholder="Опис" required />
+    <input type="date" name="startDate" placeholder="Дата початку" required />
+    <input type="date" name="endDate" placeholder="Дата кінця" required />
+    <button type="submit">Створити вибори</button>
+  </form>
+</div>
+<div>
+  <ul>
+    <li th:each="election : ${elections}">
+      <a th:href="@{/elections/{id}(id=${election.id})}">
+        <span th:text="${election.name}"></span>
+      </a> - <span th:text="${election.startDate}"></span>
+    </li>
+  </ul>
+</div>
+</body>
+</html>

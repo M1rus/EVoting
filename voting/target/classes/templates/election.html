@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Деталі виборів</title>
+</head>
+<body>
+<h1 th:text="${election.name}">Назва</h1>
+<p th:text="${election.description}">Опис</p>
+<p>Дата початку: <span th:text="${election.startDate}"></span></p>
+<p>Дата кінця: <span th:text="${election.endDate}"></span></p>
+
+
+<div sec:authorize="hasRole('ROLE_COMITEE')">
+  <h2>Додати кандидата</h2>
+  <form th:action="@{/elections/{id}/add-candidate(id=${election.id})}" method="post">
+    <input type="text" name="candidateName" placeholder="Ім'я" required />
+    <input type="text" name="candidateParty" placeholder="Партія" required />
+    <button type="submit">Додати кандидата</button>
+  </form>
+</div>
+
+<h2>Кандидати</h2>
+<ul>
+  <li th:each="entry : ${voteStats}">
+    <span th:text="${entry.key.name}">Ім'я</span>
+    <span th:text="${entry.key.party}">Партія</span>
+    <span th:text="${entry.value.total}">0</span> голосів (
+    <span th:text="${entry.value.formattedPercentage}"></span>%)
+
+    <form th:action="@{/elections/{electionId}/vote(electionId=${election.id})}" method="post"
+          th:if="${not hasUserVoted}">
+      <input type="hidden" name="candidateId" th:value="${entry.key.id}" />
+      <button type="submit">Проголосувати</button>
+    </form>
+  </li>
+</ul>
+
+<div>
+  <p th:if="${param.success} == 'voted'">Дякуємо за голос!</p>
+  <p th:if="${param.error} == 'already_voted'">Ви вже голосували на цих виборах.</p>
+  <p th:if="${param.error} == 'invalid_vote'">Невірний голос.</p>
+</div>
+</body>
+</html>
